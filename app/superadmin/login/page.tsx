@@ -1,20 +1,20 @@
-// C:\Users\Willard\barangay-management-system\app\superadmin-login\page.tsx
-// NEW "START FROM SCRATCH" VERSION USING A SERVER ACTION
-
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { createClient } from '@/lib/supabase/server'; // Assuming you have this helper
+import { createClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+// Define a more accurate type for the page props
+type Props = {
+  searchParams: {
+    error?: string;
+  };
+};
+
 // The page component is now a Server Component. It reads the URL for any error messages.
-export default function SuperAdminLoginPage({
-  searchParams,
-}: {
-  searchParams: { error?: string };
-}) {
+export default function SuperAdminLoginPage({ searchParams }: Props) { // <-- Apply the correct Props type here
 
   // This is the Server Action. It will run on the server when the form is submitted.
   const logIn = async (formData: FormData) => {
@@ -22,9 +22,6 @@ export default function SuperAdminLoginPage({
 
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-    // const cookieStore = cookies(); // This line is no longer needed
-
-    // CORRECTED: Call createClient without arguments
     const supabase = await createClient();
 
     // 1. Attempt to sign in
