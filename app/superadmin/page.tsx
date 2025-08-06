@@ -3,7 +3,6 @@
 
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { cookies } from 'next/headers'; // <-- Add this import
 import { Button } from '@/components/ui/button'; // <-- Add the import for your button
 
 export default async function SuperAdminPage() {

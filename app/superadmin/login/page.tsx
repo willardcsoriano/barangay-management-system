@@ -1,46 +1,53 @@
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-// Define a more accurate type for the page props
+// Now searchParams is a Promise of the query object
 type Props = {
-  searchParams: {
-    error?: string;
-  };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-// The page component is now a Server Component. It reads the URL for any error messages.
-export default function SuperAdminLoginPage({ searchParams }: Props) { // <-- Apply the correct Props type here
+export default async function SuperAdminLoginPage({ searchParams }: Props) {
+  // Wait for the actual search params object
+  const params = await searchParams;
+  const rawError = params.error;
+  const errorMessage = Array.isArray(rawError) ? rawError[0] : rawError;
 
-  // This is the Server Action. It will run on the server when the form is submitted.
   const logIn = async (formData: FormData) => {
     'use server';
-
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     const supabase = await createClient();
 
-    // 1. Attempt to sign in
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (signInError) {
-      return redirect('/superadmin-login?error=Could not authenticate user. Please check your credentials.');
-    }
-    
-    // Re-fetch user to confirm session
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-        return redirect('/superadmin-login?error=Authentication failed. Please try again.');
+      return redirect(
+        '/superadmin-login?error=Could not authenticate user. Please check your credentials.'
+      );
     }
 
-    // 2. Check for the user's profile and role
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return redirect(
+        '/superadmin-login?error=Authentication failed. Please try again.'
+      );
+    }
+
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('role')
@@ -48,17 +55,19 @@ export default function SuperAdminLoginPage({ searchParams }: Props) { // <-- Ap
       .single();
 
     if (profileError || !profile) {
-      await supabase.auth.signOut(); // Important: Sign out if profile is missing/inaccessible
-      return redirect('/superadmin-login?error=Authentication failed: Could not find user profile.');
+      await supabase.auth.signOut();
+      return redirect(
+        '/superadmin-login?error=Authentication failed: Could not find user profile.'
+      );
     }
 
-    // 3. Check if the role is 'superadmin'
     if (profile.role !== 'superadmin') {
-      await supabase.auth.signOut(); // Important: Sign out if role is incorrect
-      return redirect('/superadmin-login?error=Access Denied: You are not a super admin.');
+      await supabase.auth.signOut();
+      return redirect(
+        '/superadmin-login?error=Access Denied: You are not a super admin.'
+      );
     }
 
-    // 4. Success! Redirect to the dashboard.
     return redirect('/superadmin');
   };
 
@@ -73,15 +82,21 @@ export default function SuperAdminLoginPage({ searchParams }: Props) { // <-- Ap
           <form action={logIn} className="space-y-4">
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" placeholder="admin@example.com" required />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="admin@example.com"
+                required
+              />
             </div>
             <div>
               <Label htmlFor="password">Password</Label>
               <Input id="password" name="password" type="password" required />
             </div>
-            {searchParams.error && (
+            {errorMessage && (
               <p className="p-2 bg-red-100 text-red-700 text-sm rounded-md text-center">
-                {searchParams.error}
+                {errorMessage}
               </p>
             )}
             <Button type="submit" className="w-full">

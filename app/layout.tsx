@@ -1,4 +1,3 @@
-
 import './globals.css';
 import { Header } from '@/components/layout/Header'; // <-- Import Header
 import { Footer } from '@/components/layout/Footer'; // <-- Import Footer
