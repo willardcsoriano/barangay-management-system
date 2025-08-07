@@ -63,7 +63,7 @@ export async function Header() {
               ></line>
             </svg>
             <span className="hidden font-bold sm:inline-block">
-              Barangay XYZ
+              XYZ Barangay Management System
             </span>
           </Link>
         </div>
