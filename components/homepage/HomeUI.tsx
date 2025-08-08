@@ -2,7 +2,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import { BarangaySelector } from './BarangaySelector';
 
 // Define the type for the barangay data

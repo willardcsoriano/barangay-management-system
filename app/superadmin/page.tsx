@@ -1,9 +1,7 @@
-// C:\Users\Willard\barangay-management-system\app\superadmin\page.tsx
-// UPDATED WITH LOGOUT BUTTON
-
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { Button } from '@/components/ui/button'; // <-- Add the import for your button
+import { Button } from '@/components/ui/button';
+import Link from 'next/link'; // <-- Add this new import
 
 export default async function SuperAdminPage() {
   const supabase = await createClient();
@@ -11,7 +9,7 @@ export default async function SuperAdminPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/superadmin/login');
+    redirect('/superadmin-login');
   }
 
   const { data: profile, error } = await supabase
@@ -29,31 +27,37 @@ export default async function SuperAdminPage() {
     redirect('/protected');
   }
 
-  // This is the Server Action for logging out
   const signOut = async () => {
     'use server';
-
     const supabase = await createClient();
     await supabase.auth.signOut();
-    return redirect('/'); // Redirect to homepage after logout
+    return redirect('/');
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 md:p-8">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Super Admin Dashboard</h1>
-        {/* The logout button is inside a form that calls the signOut action */}
         <form action={signOut}>
           <Button type="submit" variant="outline">Logout</Button>
         </form>
       </div>
-      <p>Welcome, Super Admin. From here, you can manage the entire system.</p>
+      <p className="text-muted-foreground">
+        Welcome, Super Admin. From here, you can manage the entire system.
+      </p>
+
+      {/* --- NEW SECTION ADDED BELOW --- */}
+
+      <div className="mt-8 p-6 border bg-card text-card-foreground rounded-lg shadow-sm">
+        <h2 className="text-xl font-semibold mb-2">System Management</h2>
+        <p className="text-muted-foreground mb-4">
+          Access raw data tables for advanced administrative tasks. Use with caution.
+        </p>
+        <Button asChild>
+          <Link href="/superadmin/database">Browse Database Tables</Link>
+        </Button>
+      </div>
       
-      {/* SOON, YOU WILL ADD YOUR COMPONENTS HERE, FOR EXAMPLE:
-        <PendingUsersTable />
-        <AnnouncementsManager />
-        <BlotterReportsList />
-      */}
     </div>
   );
 }
