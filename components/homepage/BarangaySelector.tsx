@@ -39,23 +39,23 @@ export function BarangaySelector({ barangays }: { barangays: Barangay[] }) {
   };
 
   return (
-    <div className="flex w-full max-w-sm items-center space-x-2">
+    <div className="mx-auto flex w-full max-w-sm items-center justify-center gap-2">
       <Select onValueChange={handleSelectionChange} value={selectedValue}>
-        <SelectTrigger>
+        <SelectTrigger className="flex-1">
           <SelectValue placeholder="Select your barangay..." />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Available Barangays</SelectLabel>
-            {barangays.map((barangay) => (
-              <SelectItem key={barangay.id} value={barangay.id}>
-                {barangay.name}
+            {barangays.map((b) => (
+              <SelectItem key={b.id} value={b.id}>
+                {b.name}
               </SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>
       </Select>
-      <Button onClick={handleProceed} disabled={!selectedValue}>
+      <Button onClick={handleProceed} disabled={!selectedValue} className="shrink-0">
         Proceed
       </Button>
     </div>
