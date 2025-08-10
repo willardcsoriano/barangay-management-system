@@ -9,7 +9,7 @@ export default async function SuperAdminPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/superadmin-login');
+    redirect('/superadmin/login');
   }
 
   const { data: profile, error } = await supabase

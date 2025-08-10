@@ -1,3 +1,5 @@
+// C:\Users\Willard\barangay-management-system\app\superadmin\login\page.tsx
+
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/button';
